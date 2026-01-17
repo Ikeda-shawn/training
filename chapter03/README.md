@@ -98,7 +98,7 @@ AWS公式ドキュメントの「[Resource and property types reference](https:/
 
 上記リンクから作成したいリソースを選択して、必要なパラメータを記入していきます。
 
-![CloudFormation Resource Type example](../../assets/chapter03/CFn_Type.png)
+![CloudFormation Resource Type example](./assets/CFn_Type.png)
 
 ## Propertiesの構造
 
