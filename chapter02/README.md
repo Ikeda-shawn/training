@@ -1,8 +1,8 @@
 # 第2章 テンプレートの基本構造
 
-## CloudFormation テンプレートの全体構成
+## CloudFormationテンプレートの全体構成
 
-CloudFormation テンプレートは、いくつかのセクションで構成されています。
+CloudFormationテンプレートは、いくつかのセクションで構成されています。
 
 ### 基本的なテンプレート構造
 
@@ -12,6 +12,9 @@ Description: テンプレートの説明
 
 Parameters:
   # パラメータの定義
+
+Mappings:
+  # マッピングの定義
 
 Resources:
   # リソースの定義（必須）
@@ -26,11 +29,12 @@ Outputs:
 |---|---|---|
 | AWSTemplateFormatVersion | 任意（推奨） | テンプレートのバージョンを指定 |
 | Description | 任意（推奨） | テンプレートの説明 |
-| Parameters | 任意 | 外部から値を受け取る |
-| Resources | **必須** | AWS リソースを定義する |
+| Parameters | 任意 | リソースのデプロイ時に任意の値を受ける |
+| Mappings | 任意 | あらかじめ定義した対応表（マッピング）を保持する |
+| Resources | **必須** | AWSリソースを定義する |
 | Outputs | 任意 | 作成したリソースの情報を出力する |
 
-他にも `Metadata`、`Mappings`、`Conditions`、`Transform` などのセクションがありますが、本コンテンツでは基本的なセクションに絞って説明します。
+他にも `Metadata`、`Conditions`、`Transform` などのセクションがありますが、本コンテンツでは基本的なセクションに絞って説明します。
 
 ## AWSTemplateFormatVersion
 
@@ -49,16 +53,17 @@ AWSTemplateFormatVersion: '2010-09-09'
 
 テンプレートの説明を記述します。
 
-```yaml
-Description: VPC とパブリックサブネットを作成するテンプレート
-```
+省略されていることも多いですが、コードの保守性を上げる意味合いでも**どのようなリソースを作っているテンプレートなのか**程度のことを書いておくことをお勧めします。
 
-- 省略可能ですが、テンプレートの目的を明確にするために記述することが推奨されます
-- AWS コンソールでスタックを確認する際に表示されます
+```yaml
+Description: VPCとパブリックサブネットを作成するテンプレート
+```
 
 ## Parameters
 
 外部から値を受け取るための定義です。
+
+例えば、以下のように環境名やシステム名などを定義しておくことが多いです。
 
 ```yaml
 Parameters:
@@ -70,9 +75,36 @@ Parameters:
 
 詳細は [第4章 パラメータ設計と可読性](ch04_parameters.md) で説明します。
 
+## Mappings
+
+テンプレート内で使用する**固定的な対応表（マッピング）**を定義します。
+
+リージョンごとの設定値や、環境ごとに異なる定数値などを  
+テンプレート内にまとめて定義しておくために使用されます。
+
+```yaml
+Mappings:
+  RegionMap:
+    ap-northeast-1:
+      VpcCidr: 10.0.0.0/16
+    us-east-1:
+      VpcCidr: 10.1.0.0/16
+```
+
+Mappingsで定義した値は、Fn::FindInMapを使って参照します。
+
+```yaml
+CidrBlock: !FindInMap
+  - RegionMap
+  - !Ref AWS::Region
+  - VpcCidr
+```
+
+詳細は [第4章 パラメータ設計と可読性](ch04_parameters.md) で説明します。
+
 ## Resources（必須）
 
-AWS リソースを定義します。**テンプレートに必ず含める必要があります**。
+AWSリソースを定義します。**テンプレートに必ず含める必要があります**。
 
 ```yaml
 Resources:
@@ -88,6 +120,8 @@ Resources:
 
 作成したリソースの情報を出力します。
 
+Outputsで出力定義をしたリソースは別のスタックからでも利用可能となるため、出力できる情報は出力しておくことを推奨します。
+
 ```yaml
 Outputs:
   VPCId:
@@ -99,11 +133,11 @@ Outputs:
 
 ## YAML 記法の基本
 
-CloudFormation テンプレートは、YAML 形式で記述することが一般的です。
+CloudFormationテンプレートは、YAML形式で記述することが一般的です。
 
 ### インデント
 
-YAML では**インデント（字下げ）**が非常に重要です。
+YAMLでは**インデント（字下げ）**が非常に重要です。
 
 - **スペース2つ**でインデントするのが一般的です（スペース4つでも可）
 - **タブ文字は使用できません**
@@ -176,28 +210,28 @@ Resources:
       CidrBlock: 10.0.0.0/16
 ```
 
-## CloudFormation 特有の組み込み関数
+## CloudFormation特有の組み込み関数
 
-CloudFormation には、テンプレート内で使える組み込み関数があります。
+CloudFormationには、テンプレート内で使える組み込み関数があります。
 
 ### 組み込み関数の2つの記法
 
-CloudFormation の組み込み関数には、2つの書き方があります。
+CloudFormationの組み込み関数には、2つの書き方があります。
 
 #### 完全名記法
 
 ```yaml
-CidrBlock: !Ref VPCCidrBlock
+CidrBlock: 
+  Ref: VPCCidrBlock
 ```
 
 #### 短縮記法（`!` を使う）
 
 ```yaml
-CidrBlock:
-  Ref: VPCCidrBlock
+CidrBlock: !Ref VPCCidrBlock
 ```
 
-本コンテンツでは、より簡潔な**短縮記法**を使用します。
+本コンテンツでは、**短縮記法**を使用します。
 
 ### Ref（参照）
 
@@ -228,7 +262,7 @@ Resources:
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC  # MyVPC リソースの ID を参照
+      VpcId: !Ref MyVPC  # MyVPCリソースのIDを参照
 ```
 
 ### Fn::Sub（文字列置換）
@@ -236,10 +270,10 @@ Resources:
 文字列内に変数を埋め込みます。
 
 ```yaml
-Description: !Sub '${EnvironmentName} 環境の VPC'
-```
+Description: !Sub '${EnvironmentName}環境のVPC'
+``` 
 
-`EnvironmentName` が `dev` の場合、`dev 環境の VPC` という文字列になります。
+`EnvironmentName`が`dev`の場合、`dev環境のVPC`という文字列になります。
 
 ### Fn::Join（文字列結合）
 
@@ -252,7 +286,7 @@ Name: !Join
     - 'vpc'
 ```
 
-`EnvironmentName` が `dev` の場合、`dev-vpc` という文字列になります。
+`EnvironmentName`が`dev`の場合、`dev-vpc`という文字列になります。
 
 ### Fn::GetAtt（属性取得）
 
@@ -270,13 +304,13 @@ Outputs:
     Value: !GetAtt MyVPC.CidrBlock
 ```
 
-`!Ref` がリソースの ID を返すのに対し、`!GetAtt` は特定の属性を返します。
+`!Ref`がリソースのIDを返すのに対し、`!GetAtt`は特定の属性を返します。
 
 ### どの属性が取得できるか？
 
-各リソースで取得できる属性は、AWS 公式ドキュメントの「Return values」セクションに記載されています。
+各リソースで取得できる属性は、AWS公式ドキュメントの「Return values」セクションに記載されています。
 
-例：`AWS::EC2::VPC` の場合
+例：`AWS::EC2::VPC`の場合
 - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
 
 ## 実際のテンプレート例
@@ -285,7 +319,7 @@ Outputs:
 
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 学習用の VPC テンプレート
+Description: 学習用のVPCテンプレート
 
 Parameters:
   EnvironmentName:
@@ -315,16 +349,16 @@ Resources:
 
 Outputs:
   VPCId:
-    Description: VPC の ID
+    Description: VPCのID
     Value: !Ref MyVPC
 
   SubnetId:
-    Description: Subnet の ID
+    Description: SubnetのID
     Value: !Ref MySubnet
 ```
 
 ## 次の章へ
 
-テンプレートの基本構造が理解できたら、[第3章 リソース定義の書き方・読み方](ch03_resource_definition.md) に進んでください。
+テンプレートの基本構造が理解できたら、[第3章 リソース定義の書き方・読み方](ch03_resource_definition.md)に進んでください。
 
 Resources セクションの詳細な書き方を学びます。
