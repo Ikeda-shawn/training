@@ -19,9 +19,9 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 
 基本的な学習の進め方は以下としていますが、自分に合うようにカスタマイズしていていただいても問題ございません。
 
-1. `chapters/` ディレクトリ内の各章を順番に読み進める
+1. `chapter00/` から順番に各章を読み進める
 2. `templates/examples/` 内のサンプルテンプレートを実際に動かしてみる
-3. `chapters/ch09_exercises.md` の演習問題に取り組む
+3. `chapter09/exercises.md` の演習問題に取り組む
 
 ## コンテンツ構成
 
@@ -50,25 +50,35 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 ```
 .
 ├── README.md                    # 本ファイル
-├── chapters/                    # 各章のコンテンツ
-│   ├── ch00_introduction.md
-│   ├── ch01_overview.md
-│   ├── ch02_template_structure.md
-│   ├── ch03_resource_definition.md
-│   ├── ch04_parameters.md
-│   ├── ch05_outputs.md
-│   ├── ch06_lifecycle.md
-│   ├── ch07_operations.md
-│   ├── ch08_antipatterns.md
-│   ├── ch09_exercises.md
-│   └── ch10_summary.md
-├── templates/                  # CloudFormation テンプレート
-│   ├── examples/               # サンプルテンプレート
-│   └── exercises/              # 演習用テンプレート
-└── appendix/                   # 付録
-    ├── aws-cli-commands.md     # AWS CLI コマンド集
-    ├── documentation-guide.md  # 公式ドキュメントの探し方
-    └── error-messages.md       # エラーメッセージの読み方
+├── chapter00/                   # 第0章：はじめに
+│   └── introduction.md
+├── chapter01/                   # 第1章：CloudFormation の全体像と基本概念
+│   └── overview.md
+├── chapter02/                   # 第2章：テンプレートの基本構造
+│   └── template_structure.md
+├── chapter03/                   # 第3章：リソース定義の書き方・読み方
+│   └── resource_definition.md
+├── chapter04/                   # 第4章：パラメータ設計と可読性
+│   └── parameters.md
+├── chapter05/                   # 第5章：Outputs とスタック連携
+│   └── outputs.md
+├── chapter06/                   # 第6章：スタックのライフサイクル
+│   └── lifecycle.md
+├── chapter07/                   # 第7章：運用上の注意点
+│   └── operations.md
+├── chapter08/                   # 第8章：よくあるアンチパターン
+│   └── antipatterns.md
+├── chapter09/                   # 第9章：演習
+│   └── exercises.md
+├── chapter10/                   # 第10章：まとめ
+│   └── summary.md
+├── templates/                   # CloudFormation テンプレート
+│   ├── examples/                # サンプルテンプレート
+│   └── exercises/               # 演習用テンプレート
+└── appendix/                    # 付録
+    ├── aws-cli-commands.md      # AWS CLI コマンド集
+    ├── documentation-guide.md   # 公式ドキュメントの探し方
+    └── error-messages.md        # エラーメッセージの読み方
 ```
 
 ## 前提知識
