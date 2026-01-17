@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: VPC とサブネットを作成するテンプレート
+
+# パラメータ
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: 環境名
+    AllowedValues:
+      - dev
+      - stg
+      - prod
+
+  VPCCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: VPC の CIDR ブロック
+
+# リソース
+Resources:
+  # VPC
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-vpc'
+
+  # パブリックサブネット
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.1.0/24
+      AvailabilityZone: ap-northeast-1a
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-public-subnet'
+
+  # プライベートサブネット
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.2.0/24
+      AvailabilityZone: ap-northeast-1c
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-private-subnet'
+
+# 出力
+Outputs:
+  VPCId:
+    Description: VPC の ID
+    Value: !Ref MyVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'
+
+  PublicSubnetId:
+    Description: パブリックサブネットの ID
+    Value: !Ref PublicSubnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PublicSubnetId'
+
+  PrivateSubnetId:
+    Description: プライベートサブネットの ID
+    Value: !Ref PrivateSubnet
+    Export:
+      Name: !Sub '${AWS::StackName}-PrivateSubnetId'

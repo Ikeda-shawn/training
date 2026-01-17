@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: パラメータを使った VPC テンプレート
+
+# パラメータの定義
+Parameters:
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: 環境名（dev, stg, prod）
+    AllowedValues:
+      - dev
+      - stg
+      - prod
+
+  VPCCidrBlock:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: VPC の CIDR ブロック
+    AllowedPattern: '^(10|172|192)\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}/\\d{1,2}$'
+    ConstraintDescription: 有効なプライベート IP アドレス範囲を指定してください
+
+# リソースの定義
+Resources:
+  # VPC
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidrBlock
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-vpc'
+        - Key: Environment
+          Value: !Ref EnvironmentName
+
+# 出力
+Outputs:
+  VPCId:
+    Description: VPC の ID
+    Value: !Ref MyVPC
+    Export:
+      Name: !Sub '${AWS::StackName}-VPCId'
+
+  VPCCidrBlock:
+    Description: VPC の CIDR ブロック
+    Value: !GetAtt MyVPC.CidrBlock

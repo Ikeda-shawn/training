@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: アプリケーションリソーススタック（スタック分割の例）
+
+# パラメータ
+Parameters:
+  NetworkStackName:
+    Type: String
+    Default: dev-network-stack
+    Description: ネットワークスタックのスタック名
+
+  EnvironmentName:
+    Type: String
+    Default: dev
+    Description: 環境名
+    AllowedValues:
+      - dev
+      - stg
+      - prod
+
+# リソース
+Resources:
+  # Web サーバー用 SecurityGroup
+  WebSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${EnvironmentName}-web-sg'
+      GroupDescription: Security group for web servers
+      VpcId: !ImportValue
+        Fn::Sub: '${NetworkStackName}-VPCId'
+      SecurityGroupIngress:
+        # HTTP
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTP from anywhere
+        # HTTPS
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTPS from anywhere
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-web-sg'
+
+  # データベース用 SecurityGroup
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub '${EnvironmentName}-db-sg'
+      GroupDescription: Security group for database servers
+      VpcId: !ImportValue
+        Fn::Sub: '${NetworkStackName}-VPCId'
+      SecurityGroupIngress:
+        # MySQL（Web サーバーからのみ許可）
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref WebSecurityGroup
+          Description: Allow MySQL from web servers
+      Tags:
+        - Key: Name
+          Value: !Sub '${EnvironmentName}-db-sg'
+
+# 出力
+Outputs:
+  WebSecurityGroupId:
+    Description: Web サーバー用 SecurityGroup の ID
+    Value: !Ref WebSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-WebSecurityGroupId'
+
+  DatabaseSecurityGroupId:
+    Description: データベース用 SecurityGroup の ID
+    Value: !Ref DatabaseSecurityGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-DatabaseSecurityGroupId'

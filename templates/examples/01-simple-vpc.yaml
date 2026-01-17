@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: シンプルな VPC を作成するテンプレート
+
+# リソースの定義
+Resources:
+  # VPC
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: simple-vpc
+
+# 作成したリソースの情報を出力
+Outputs:
+  VPCId:
+    Description: VPC の ID
+    Value: !Ref MyVPC
+
+  VPCCidrBlock:
+    Description: VPC の CIDR ブロック
+    Value: !GetAtt MyVPC.CidrBlock

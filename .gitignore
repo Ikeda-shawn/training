@@ -1,0 +1,35 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AWS credentials(絶対にコミットしないこと)
+.aws/
+credentials
+*.pem
+*.key
+
+# CloudFormation output files
+*.template.json
+cfn-outputs/
+
+# Temporary files
+*.tmp
+*.bak
+tmp/
+temp/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
