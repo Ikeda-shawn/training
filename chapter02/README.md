@@ -73,7 +73,7 @@ Parameters:
     Description: 環境名（dev, stg, prod）
 ```
 
-詳細は [第4章 パラメータ設計と可読性](ch04_parameters.md) で説明します。
+詳細は [第4章 パラメータ設計と可読性](../chapter04/README.md) で説明します。
 
 ## Mappings
 
@@ -100,7 +100,7 @@ CidrBlock: !FindInMap
   - VpcCidr
 ```
 
-詳細は [第4章 パラメータ設計と可読性](ch04_parameters.md) で説明します。
+詳細は [第4章 パラメータ設計と可読性](../chapter04/README.md) で説明します。
 
 ## Resources（必須）
 
@@ -114,7 +114,7 @@ Resources:
       CidrBlock: 10.0.0.0/16
 ```
 
-詳細は [第3章 リソース定義の書き方・読み方](ch03_resource_definition.md) で説明します。
+詳細は [第3章 リソース定義の書き方・読み方](../chapter03/README.md) で説明します。
 
 ## Outputs
 
@@ -129,7 +129,7 @@ Outputs:
     Description: VPC の ID
 ```
 
-詳細は [第5章 Outputs とスタック連携の考え方](ch05_outputs.md) で説明します。
+詳細は [第5章 Outputs とスタック連携の考え方](../chapter05/README.md) で説明します。
 
 ## YAML 記法の基本
 
@@ -359,6 +359,6 @@ Outputs:
 
 ## 次の章へ
 
-テンプレートの基本構造が理解できたら、[第3章 リソース定義の書き方・読み方](ch03_resource_definition.md)に進んでください。
+テンプレートの基本構造が理解できたら、[第3章 リソース定義の書き方・読み方](../chapter03/README.md)に進んでください。
 
 Resources セクションの詳細な書き方を学びます。

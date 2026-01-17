@@ -131,4 +131,4 @@ IssuesやPRで以下のような質問を頂ければ、可能な限り回答さ
 
 ## 次の章へ
 
-準備が整いましたら、[第1章 CloudFormationの全体像と基本概念](ch01_overview.md) に進んでください。
+準備が整いましたら、[第1章 CloudFormationの全体像と基本概念](../chapter01/README.md) に進んでください。

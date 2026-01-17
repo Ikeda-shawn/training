@@ -192,6 +192,6 @@ ChangeSet 機能を使うことで、変更を適用する前に以下を確認�
 
 ## 次の章へ
 
-CloudFormation の全体像が理解できたら、[第2章 テンプレートの基本構造](ch02_template_structure.md) に進んでください。
+CloudFormation の全体像が理解できたら、[第2章 テンプレートの基本構造](../chapter02/README.md) に進んでください。
 
 実際にテンプレートがどのように構成されているかを学びます。

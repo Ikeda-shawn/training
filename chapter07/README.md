@@ -255,6 +255,6 @@ aws cloudformation describe-stack-resource-drifts --stack-name prod-stack
 
 ## 次の章へ
 
-運用上の注意点が理解できたら、[第8章 よくあるアンチパターン](ch08_antipatterns.md) に進んでください。
+運用上の注意点が理解できたら、[第8章 よくあるアンチパターン](../chapter08/README.md) に進んでください。
 
 避けるべき設計パターンを学び、より良いテンプレートを書けるようになります。

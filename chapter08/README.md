@@ -343,6 +343,6 @@ ansible-playbook deploy.yml
 
 ## 次の章へ
 
-アンチパターンが理解できたら、[第9章 演習（CloudFormation テンプレート作成）](ch09_exercises.md) に進んでください。
+アンチパターンが理解できたら、[第9章 演習（CloudFormation テンプレート作成）](../chapter09/README.md) に進んでください。
 
 実際にテンプレートを作成する演習問題に取り組みます。
