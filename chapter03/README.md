@@ -2,7 +2,11 @@
 
 ## リソース定義の基本構造
 
-CloudFormation テンプレートで最も重要なのが `Resources` セクションです。
+CloudFormationテンプレートで最も重要なのが`Resources`セクションです。
+
+Resourceセクションでは前章の通りで、AWSリソースを定義していきます。
+
+基本的な書き方は以下のようになっています。
 
 ### 基本的な書き方
 
@@ -27,7 +31,7 @@ Resources:
 
 ## 論理IDと物理IDの違い
 
-CloudFormation では、リソースに2つの ID が存在します。
+CloudFormationでは、リソースに2つのIDが存在します。
 
 ### 論理ID（Logical ID）
 
@@ -40,18 +44,16 @@ Resources:
 ```
 
 - テンプレート内で一意である必要があります
-- 英数字とハイフンのみ使用可能（スペース不可）
+- 英数字のみ使用可能です
 - 大文字小文字を区別します
-- 他のリソースから `!Ref` で参照する際に使います
+- 他のリソースから`!Ref`で参照する際に使います
 
 ### 物理ID（Physical ID）
 
-**AWS 上で実際に作成されたリソースの ID** です。
+**AWS上で実際に作成されたリソースのID**です。
 
-- CloudFormation が自動的に割り当てます
-- `vpc-0123456789abcdef0` のような形式
-- AWS コンソールで確認できます
-- `!Ref` を使うと、この物理 ID が取得できます
+- CloudFormationが自動的に割り当てます
+- `vpc-0123456789abcdef0`のような形式で、皆さんが普段コンソールで見ているIDがこちらに該当します
 
 ### 論理IDと物理IDの関係
 
@@ -65,14 +67,14 @@ Resources:
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC  # MyVPC の物理ID（例: vpc-xxx）が入る
+      VpcId: !Ref MyVPC  # MyVPCの物理ID（例: vpc-xxx）をよしなに入れてくれる
 ```
 
-## Resource Type の考え方
+## Resource Typeの考え方
 
-`Type` には、作成する AWS リソースの種類を指定します。
+`Type`には、作成するAWSリソースの種類を指定します。
 
-### Resource Type の形式
+### Resource Typeの形式
 
 ```
 AWS::サービス名::リソース名
@@ -90,21 +92,23 @@ AWS::サービス名::リソース名
 | IAM Role | `AWS::IAM::Role` |
 | RDS Instance | `AWS::RDS::DBInstance` |
 
-### Resource Type の探し方
+### Resource Typeの探し方
 
-AWS 公式ドキュメントの「Resource and property types reference」に全てのリソースタイプが記載されています。
+AWS公式ドキュメントの「[Resource and property types reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)」に全てのリソースタイプが記載されています。
 
-https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html
+上記リンクから作成したいリソースを選択して、必要なパラメータを記入していきます。
 
-## Properties の構造
+![CloudFormation Resource Type example](../../assets/chapter03/CFn_Type.png)
 
-`Properties` には、リソースの具体的な設定を記述します。
+## Propertiesの構造
 
-### Properties はリソースごとに異なる
+`Properties`には、リソースの具体的な設定を記述します。
 
-VPC と EC2 では、設定できる項目が全く異なります。
+### Propertiesはリソースごとに異なる
 
-#### VPC の例
+当然ですが、VPCとEC2では設定できる項目が全く異なります。
+
+#### VPCの例
 
 ```yaml
 Resources:
@@ -116,7 +120,7 @@ Resources:
       EnableDnsSupport: true
 ```
 
-#### EC2 の例
+#### EC2の例
 
 ```yaml
 Resources:
@@ -132,17 +136,19 @@ Resources:
 
 各リソースには、**必須のプロパティ**と**任意のプロパティ**があります。
 
-AWS 公式ドキュメントの各リソースページに記載されています。
+AWS公式ドキュメントの各リソースページに記載されています。
 
 例：`AWS::EC2::VPC` の場合
 
 - `CidrBlock` は**必須**
-- `EnableDnsHostnames` は任意
+- `EnableDnsHostnames`は任意
 - `Tags` は任意
 
-## AWS 公式ドキュメントの読み方
+任意となっているものでもユーザ側で設定しない場合、AWS側でよしなに設定されるものがあるので注意して下さい。
 
-CloudFormation を使いこなすには、公式ドキュメントを読む力が重要です。
+## AWS公式ドキュメントの読み方
+
+CloudFormationを使いこなすには、公式ドキュメントを読む力が重要です。
 
 ### ドキュメントの構成
 
@@ -150,32 +156,32 @@ CloudFormation を使いこなすには、公式ドキュメントを読む力�
 
 1. **Syntax**：基本的な書き方
 2. **Properties**：各プロパティの詳細
-3. **Return values**：`!Ref` や `!GetAtt` で取得できる値
+3. **Return values**：`!Ref`や`!GetAtt`で取得できる値
 4. **Examples**：実際の使用例
 
-### 例：AWS::EC2::VPC のドキュメントを読む
+### 例：AWS::EC2::VPCのドキュメントを読む
 
-https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html
+公式ドキュメント: [AWS::EC2::VPC](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-vpc.html)
 
 #### 1. Syntax（書き方）
 
-YAML 形式での基本的な書き方が示されています。
+YAML形式での基本的な書き方が示されています。
 
 #### 2. Properties（プロパティ）
 
 各プロパティの詳細が記載されています。
 
 - **Required**：必須かどうか
-- **Type**：データ型（String、Boolean など）
+- **Type**：データ型（String、Booleanなど）
 - **Update requires**：更新時の挙動（後述）
 
 #### 3. Return values
 
-`!Ref` で何が返るか、`!GetAtt` でどの属性が取得できるかが記載されています。
+`!Ref`で何が返るか、`!GetAtt`でどの属性が取得できるかが記載されています。
 
 例：
-- `!Ref MyVPC` → VPC の ID（`vpc-xxx`）
-- `!GetAtt MyVPC.CidrBlock` → CIDR ブロック（`10.0.0.0/16`）
+- `!Ref MyVPC` → VPCのID（`vpc-xxx`）
+- `!GetAtt MyVPC.CidrBlock` → CIDRブロック（`10.0.0.0/16`）
 
 #### 4. Examples
 
@@ -185,7 +191,7 @@ YAML 形式での基本的な書き方が示されています。
 
 ### 1. VPC（Virtual Private Cloud）
 
-AWS 上にプライベートネットワーク空間を作成します。
+AWS上にプライベートネットワーク空間を作成します。
 
 ```yaml
 Resources:
@@ -202,7 +208,7 @@ Resources:
 
 ### 2. Subnet
 
-VPC 内にサブネットを作成します。
+VPC内にサブネットを作成します。
 
 ```yaml
 Resources:
@@ -220,7 +226,7 @@ Resources:
 
 ### 3. SecurityGroup
 
-ファイアウォールのルールを定義します。
+セキュリティグループのルールを定義します。
 
 ```yaml
 Resources:
@@ -245,7 +251,7 @@ Resources:
 
 ### 4. IAM Role
 
-AWS サービスに権限を付与するためのロールを定義します。
+AWSサービスに権限を付与するためのロールを定義します。
 
 ```yaml
 Resources:
@@ -266,11 +272,11 @@ Resources:
           Value: my-iam-role
 ```
 
-## Tags の付け方
+## Tagsの付け方
 
-ほとんどの AWS リソースには、`Tags` を設定できます。
+ほとんどのAWSリソースには、`Tags`を設定できます。
 
-### Tags とは
+### Tagsとは
 
 リソースにメタデータを付与する仕組みです。
 
@@ -278,7 +284,7 @@ Resources:
 - コスト配分タグ
 - 検索・フィルタリング用
 
-### Tags の書き方
+### Tagsの書き方
 
 ```yaml
 Tags:
@@ -290,11 +296,12 @@ Tags:
     Value: team-a
 ```
 
-### Name タグの重要性
+### タグの重要性
 
-`Name` タグは、AWS コンソール上での表示名になります。
+`Name`タグは、コンソール上での表示名になります。設定することで、リソースの識別が容易になります。
 
-設定することで、リソースの識別が容易になります。
+タグをつけておくと特定の時間に停止するリソースの区別などの可能になります。
+
 
 ```yaml
 Tags:
