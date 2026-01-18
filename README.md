@@ -1,5 +1,13 @@
 # CloudFormation 学習コンテンツ
 
+## 免責事項
+
+**本コンテンツは教育目的で作成されたものであり、利用は自己責任でお願いいたします。**
+
+本コンテンツの利用により発生したいかなる損害（AWS利用料金の発生、データの損失、システム障害、その他の直接的・間接的損害を含む）についても、作成者は一切の責任を負いません。
+
+本コンテンツのサンプルテンプレートやコードは、商用利用や本番環境での利用を想定したものではありません。実務で使用する場合は、必ずご自身の責任において十分な検証を行ってください。
+
 ## 本コンテンツについて
 
 本リポジトリは、**AWS CloudFormationを用いたAWS環境構築を学習するための教育用コンテンツ**です。
@@ -21,7 +29,7 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 
 1. `chapter00/` から順番に各章を読み進める
 2. `templates/examples/` 内のサンプルテンプレートを実際に動かしてみる
-3. `chapter09/exercises.md` の演習問題に取り組む
+3. `chapter09/README.md` の演習問題に取り組む
 
 ## コンテンツ構成
 
@@ -31,17 +39,17 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 
 | 章 | タイトル | 内容 |
 |---|---|---|
-| 第0章 | はじめに | 本コンテンツの目的とスタンス |
-| 第1章 | CloudFormation の全体像と基本概念 | CloudFormation とは何か、基本用語 |
-| 第2章 | テンプレートの基本構造 | テンプレートの構成要素、YAML記法、組み込み関数 |
-| 第3章 | リソース定義の書き方・読み方 | 論理ID・物理ID、Properties、公式ドキュメントの読み方 |
-| 第4章 | パラメータ設計と可読性 | Parameters の使い方、環境差分の扱い方 |
-| 第5章 | Outputs とスタック連携 | Outputs の役割、Export/ImportValue、スタック分割 |
-| 第6章 | スタックのライフサイクル | スタック作成・更新・削除、ChangeSet |
-| 第7章 | 運用上の注意点 | 手動変更の問題、Drift Detection |
-| 第8章 | よくあるアンチパターン | 避けるべき設計パターン |
-| 第9章 | 演習 | 実践的な演習問題 |
-| 第10章 | まとめ | 学習の振り返りと次のステップ |
+| [第0章](./chapter00/README.md) | はじめに | 本コンテンツの目的とスタンス |
+| [第1章](./chapter01/README.md) | CloudFormation の全体像と基本概念 | CloudFormation とは何か、基本用語 |
+| [第2章](./chapter02/README.md) | テンプレートの基本構造 | テンプレートの構成要素、YAML記法、組み込み関数 |
+| [第3章](./chapter03/README.md) | リソース定義の書き方・読み方 | 論理ID・物理ID、Properties、公式ドキュメントの読み方 |
+| [第4章](./chapter04/README.md) | パラメータ設計と可読性 | Parameters の使い方、環境差分の扱い方 |
+| [第5章](./chapter05/README.md) | Outputs とスタック連携 | Outputs の役割、Export/ImportValue、スタック分割 |
+| [第6章](./chapter06/README.md) | スタックのライフサイクル | スタック作成・更新・削除、ChangeSet |
+| [第7章](./chapter07/README.md) | 運用上の注意点 | 手動変更の問題、Drift Detection |
+| [第8章](./chapter08/README.md) | よくあるアンチパターン | 避けるべき設計パターン |
+| [第9章](./chapter09/README.md) | 演習 | 実践的な演習問題 |
+| [第10章](./chapter10/README.md) | まとめ | 学習の振り返りと次のステップ |
 
 ### 📁 ディレクトリ構成
 
@@ -51,27 +59,27 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 .
 ├── README.md                    # 本ファイル
 ├── chapter00/                   # 第0章：はじめに
-│   └── introduction.md
+│   └── README.md
 ├── chapter01/                   # 第1章：CloudFormation の全体像と基本概念
-│   └── overview.md
+│   └── README.md
 ├── chapter02/                   # 第2章：テンプレートの基本構造
-│   └── template_structure.md
+│   └── README.md
 ├── chapter03/                   # 第3章：リソース定義の書き方・読み方
-│   └── resource_definition.md
+│   └── README.md
 ├── chapter04/                   # 第4章：パラメータ設計と可読性
-│   └── parameters.md
+│   └── README.md
 ├── chapter05/                   # 第5章：Outputs とスタック連携
-│   └── outputs.md
+│   └── README.md
 ├── chapter06/                   # 第6章：スタックのライフサイクル
-│   └── lifecycle.md
+│   └── README.md
 ├── chapter07/                   # 第7章：運用上の注意点
-│   └── operations.md
+│   └── README.md
 ├── chapter08/                   # 第8章：よくあるアンチパターン
-│   └── antipatterns.md
+│   └── README.md
 ├── chapter09/                   # 第9章：演習
-│   └── exercises.md
+│   └── README.md
 ├── chapter10/                   # 第10章：まとめ
-│   └── summary.md
+│   └── README.md
 ├── templates/                   # CloudFormation テンプレート
 │   ├── examples/                # サンプルテンプレート
 │   └── exercises/               # 演習用テンプレート
@@ -98,6 +106,7 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 - **商用利用や業務システムへの直接適用を目的としていません**
 - セキュリティ、可用性、コスト最適化に関する個別要件への対応は含まれていません
 - 本番環境での利用を前提とした設計レビューは行っていません
+- **本コンテンツの利用により発生したいかなる損害についても、作成者は責任を負いません**
 
 ### AWS 利用料金について
 
@@ -106,7 +115,7 @@ CloudFormationの基本的な考え方やテンプレートの書き方を学び
 - 不要なリソースは速やかに削除してください
 - AWS Free Tier の範囲内で学習することを推奨します
 - 料金については事前に AWS 公式ドキュメントをご確認ください
-- 本リポジトリに存在しているコンテンツを利用したことにより、想定外の費用が発生した場合の責任は負えません
+- **本リポジトリに存在しているコンテンツを利用したことにより、想定外の費用が発生した場合でも、作成者は一切の責任を負いません**
 
 ## ライセンス
 
