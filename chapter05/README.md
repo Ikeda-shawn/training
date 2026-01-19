@@ -1,28 +1,23 @@
-# 第5章 Outputs とスタック連携の考え方
+# 第5章 Outputsとスタック連携の考え方
 
-## Outputs の役割
+## Outputsの役割
 
-`Outputs` セクションは、スタックが作成したリソースの情報を**外部に公開**するための仕組みです。
+`Outputs`セクションはスタックによって作成されたリソースの情報を**他のスタックで再利用**するために出力する仕組みです。
 
-### Outputs を使わない場合
+### Outputsを使わない場合
 
-リソースの ID を知りたい場合、AWS コンソールや AWS CLI で確認する必要があります。
+リソースのID(インスタンスIDなど)を知りたい場合、コンソールやAWS CLIで確認する必要があります。
 
 ```bash
 # VPC ID を確認
 aws ec2 describe-vpcs --filters "Name=tag:Name,Values=my-vpc"
 ```
 
-### Outputs を使う場合
+これらを取得して別のスタックを作成する都度値を渡すのは非効率的です。
 
-スタックの出力として、必要な情報を取得できます。
+そこで使うのが`Outputs`セクションです。
 
-```bash
-# スタックの Outputs を確認
-aws cloudformation describe-stacks --stack-name my-stack
-```
-
-## Outputs の基本的な書き方
+## Outputsの基本的な書き方
 
 ```yaml
 Outputs:
@@ -42,47 +37,47 @@ Resources:
 
 Outputs:
   VPCId:
-    Description: 作成された VPC の ID
+    Description: 作成されたVPCのID
     Value: !Ref MyVPC
 
   VPCCidrBlock:
-    Description: VPC の CIDR ブロック
+    Description: VPCのCIDRブロック
     Value: !GetAtt MyVPC.CidrBlock
 ```
 
 ## 他スタックから参照される値とは
 
-Outputs には、`Export` を追加することで、**他のスタックから参照できる**ようになります。
+Outputsは、`Export`の有無で他スタックから参照できるかどうかが変わります。
 
-### Export を使わない Outputs
+### Exportを使わないOutputs
 
 ```yaml
 Outputs:
   VPCId:
-    Description: VPC の ID
+    Description: VPCのID
     Value: !Ref MyVPC
 ```
 
-この Outputs は、スタックの情報として表示されますが、他のスタックからは参照できません。
+このOutputsはスタックの情報として表示されますが、他のスタックからは参照できません。
 
-### Export を使う Outputs
+他スタックから参照させるためには以下の`Export`を利用します。
+
+### Exportを使うOutputs
 
 ```yaml
 Outputs:
   VPCId:
-    Description: VPC の ID
+    Description: VPCのID
     Value: !Ref MyVPC
     Export:
       Name: !Sub '${AWS::StackName}-VPCId'
 ```
 
-`Export` の `Name` は、AWS アカウント内で**一意**である必要があります。
+`Export`の`Name`は同一リージョン・アカウント内で**一意**である必要があります。
 
-`${AWS::StackName}` を使うことで、スタック名をプレフィックスにし、一意性を確保できます。
+## Export/ImportValueの基本
 
-## Export / ImportValue の基本
-
-### Export する側（ネットワークスタック）
+### Exportする側（ネットワークスタック）
 
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
@@ -102,19 +97,21 @@ Resources:
 
 Outputs:
   VPCId:
-    Description: VPC の ID
+    Description: VPCのID
     Value: !Ref MyVPC
     Export:
       Name: !Sub '${AWS::StackName}-VPCId'
 
   SubnetId:
-    Description: Subnet の ID
+    Description: SubnetのID
     Value: !Ref MySubnet
     Export:
       Name: !Sub '${AWS::StackName}-SubnetId'
 ```
 
-### ImportValue する側（アプリケーションスタック）
+### ImportValueする側（アプリケーションスタック）
+
+参照する側ではImportValueという組み込み関数を使って参照していきます。
 
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
@@ -150,20 +147,26 @@ Resources:
         - !Ref MySecurityGroup
 ```
 
-### ImportValue の注意点
+### ImportValueの注意点
 
-- **Export している値を変更・削除すると、それを ImportValue しているスタックに影響が出ます**
-- Export している値を変更する場合は、先に ImportValue しているスタックを削除または更新する必要があります
+- **Exportしている値を変更・削除するとそれをImportValueしているスタックに影響が出ます**
+- Exportしている値を変更する場合、先にImportValueしているスタックを削除または更新する必要があります
+
+上記の注意点より環境作成後にスタックを更新するためには依存関係に注意する必要があります。
 
 ## スタック分割の考え方（概要レベル）
 
-すべてのリソースを1つのスタックに詰め込むのではなく、適切に分割することが推奨されます。
+ImportValueの注意点の箇所でも記載をしましたが、CFnはスタックの分割レベルがそのまま依存関係につながります。
+
+そのため本項目の考え方はあくまでも参考ですが、注意して理解するようにして下さい。
 
 ### 分割の基準
 
+分割の基準は様々ですが、一般的に以下の基準に従って分割されることが多いです。
+
 #### 1. ライフサイクルが異なるリソース
 
-- **ネットワーク層**：VPC、Subnet（めったに変更しない）
+- **ネットワーク層**：VPC、Subnet（一度作成したらめったに変更しない）
 - **アプリケーション層**：EC2、RDS（頻繁に変更する）
 
 #### 2. 責任範囲が異なるリソース
@@ -173,7 +176,7 @@ Resources:
 
 #### 3. 再利用したいリソース
 
-- **共通ネットワークスタック**：複数のアプリケーションで共有する VPC
+- **共通ネットワークスタック**：複数のアプリケーションで共有するVPC
 - **個別アプリケーションスタック**：アプリケーション固有のリソース
 
 ### スタック分割の例
@@ -181,9 +184,7 @@ Resources:
 ```
 network-stack（ネットワーク層）
   ├─ VPC
-  ├─ Subnet（Public）
-  ├─ Subnet（Private）
-  ├─ InternetGateway
+  ├─ Subnet（Public/Private）
   └─ RouteTable
 
 application-stack（アプリケーション層）
@@ -195,82 +196,71 @@ application-stack（アプリケーション層）
 ### スタック分割のメリット
 
 1. **変更の影響範囲を限定できる**
-   - アプリケーションの変更で、ネットワークに影響を与えない
+   - アプリケーションの変更でネットワークに影響を与えることがなくなります
 
 2. **再デプロイが高速**
-   - 小さなスタックの方が、デプロイが速い
+   - 小さなスタックの方がデプロイが早いです
 
 3. **管理がしやすい**
-   - スタックごとに責任範囲が明確になる
+   - スタックごとに責任範囲が明確になります
 
 ### スタック分割のデメリット
 
 1. **複雑性が増す**
-   - スタック間の依存関係を管理する必要がある
+   - スタック間の依存関係を管理する必要があります
 
 2. **削除の順序に注意が必要**
-   - ImportValue している側を先に削除する必要がある
+   - ImportValueしている側を先に削除する必要があります
 
-## 密結合を避けるための設計視点
+## 再利用性を高めるExport/Import設計
 
-### 密結合とは
+### Export名の設計パターン
 
-スタック間の依存関係が強すぎて、一方を変更すると他方も変更が必要になる状態です。
+Export名は同一リージョン・アカウント内で一意である必要があります。
 
-#### 悪い例：密結合
+そのため、Export名の設計によって同じテンプレートを複数環境で使えるかどうかが決まります。
+
+#### 推奨：命名規則を決めてExport名を固定する
 
 ```yaml
 # ネットワークスタック
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues: [dev, stg, prod]
+
 Outputs:
   PublicSubnet1Id:
     Value: !Ref PublicSubnet1
     Export:
-      Name: PublicSubnet1Id  # スタック名を含まない
-
-  PublicSubnet2Id:
-    Value: !Ref PublicSubnet2
-    Export:
-      Name: PublicSubnet2Id  # スタック名を含まない
-```
-
-```yaml
-# アプリケーションスタック
-Resources:
-  MyEC2:
-    Type: AWS::EC2::Instance
-    Properties:
-      SubnetId: !ImportValue PublicSubnet1Id  # ハードコード
-```
-
-この設計では、Export 名が固定されているため、複数の環境で同じテンプレートを使えません。
-
-#### 良い例：疎結合
-
-```yaml
-# ネットワークスタック
-Outputs:
-  PublicSubnet1Id:
-    Value: !Ref PublicSubnet1
-    Export:
-      Name: !Sub '${AWS::StackName}-PublicSubnet1Id'  # スタック名を含む
+      Name: !Sub '${Environment}-PublicSubnet1Id'  # 環境名を含める
 ```
 
 ```yaml
 # アプリケーションスタック
 Parameters:
-  NetworkStackName:
+  Environment:
     Type: String
-    Description: ネットワークスタック名
+    AllowedValues: [dev, stg, prod]
 
 Resources:
   MyEC2:
     Type: AWS::EC2::Instance
     Properties:
       SubnetId: !ImportValue
-        Fn::Sub: '${NetworkStackName}-PublicSubnet1Id'  # パラメータで柔軟に
+        Fn::Sub: '${Environment}-PublicSubnet1Id'  # 同じ環境名で参照
 ```
 
-この設計では、パラメータで柔軟にスタックを指定できます。
+**この設計のメリット:**
+
+- Export名が明確で分かりやすい（`dev-PublicSubnet1Id`、`stg-PublicSubnet1Id`、`prod-PublicSubnet1Id`）
+- Import側もシンプルでスタック名を意識する必要がない
+- 命名規則が統一されているためどのスタックがどの環境のリソースを参照しているか一目で分かる
+
+**この方式が使えるケース:**
+
+- 同一アカウント内に複数環境を構築する場合
+- 環境ごとにAWSアカウントを分けている場合（各アカウント内でExport名は一意なので問題ない）
 
 ## 実践例：ネットワークスタックとアプリケーションスタックの分離
 
@@ -281,9 +271,10 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: ネットワークリソーススタック
 
 Parameters:
-  EnvironmentName:
+  Environment:
     Type: String
     Default: dev
+    AllowedValues: [dev, stg, prod]
 
 Resources:
   MyVPC:
@@ -292,7 +283,7 @@ Resources:
       CidrBlock: 10.0.0.0/16
       Tags:
         - Key: Name
-          Value: !Sub '${EnvironmentName}-vpc'
+          Value: !Sub '${Environment}-vpc'
 
   PublicSubnet:
     Type: AWS::EC2::Subnet
@@ -301,32 +292,32 @@ Resources:
       CidrBlock: 10.0.1.0/24
       Tags:
         - Key: Name
-          Value: !Sub '${EnvironmentName}-public-subnet'
+          Value: !Sub '${Environment}-public-subnet'
 
 Outputs:
   VPCId:
     Description: VPC ID
     Value: !Ref MyVPC
     Export:
-      Name: !Sub '${AWS::StackName}-VPCId'
+      Name: !Sub '${Environment}-VPCId'
 
   PublicSubnetId:
     Description: Public Subnet ID
     Value: !Ref PublicSubnet
     Export:
-      Name: !Sub '${AWS::StackName}-PublicSubnetId'
+      Name: !Sub '${Environment}-PublicSubnetId'
 ```
 
 ### application-stack.yaml
-
 ```yaml
 AWSTemplateFormatVersion: '2010-09-09'
 Description: アプリケーションリソーススタック
 
 Parameters:
-  NetworkStackName:
+  Environment:
     Type: String
-    Description: ネットワークスタック名
+    Default: dev
+    AllowedValues: [dev, stg, prod]
 
 Resources:
   MySecurityGroup:
@@ -334,7 +325,7 @@ Resources:
     Properties:
       GroupDescription: App security group
       VpcId: !ImportValue
-        Fn::Sub: '${NetworkStackName}-VPCId'
+        Fn::Sub: '${Environment}-VPCId'
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
@@ -349,6 +340,6 @@ Outputs:
 
 ## 次の章へ
 
-Outputs とスタック連携が理解できたら、[第6章 スタックのライフサイクル](../chapter06/README.md) に進んでください。
+Outputsとスタック連携が理解できたら[第6章 スタックのライフサイクル](../chapter06/README.md) に進んでください。
 
 スタックの作成・更新・削除の流れを学びます。
